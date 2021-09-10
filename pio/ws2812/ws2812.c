@@ -122,6 +122,21 @@ void show_all(uint t) {
     }
 }
 
+void story() {
+    // worm finds the light
+    // worm moves around randomly
+    // worm gets to spin (faster and faster)
+    // worm overheats
+    // worm heartbeats
+    // worm grows a sparkling longer tail
+    // fade out
+    // fireworks
+    // p - o - p - !
+    // pop! pulsating
+    // pop! static
+    // (smiley)
+}
+
 int main() {
     //set_sys_clock_48();
     stdio_init_all();
