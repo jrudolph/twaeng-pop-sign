@@ -186,27 +186,67 @@ uint8_t random_next_pos(uint8_t at, uint8_t exclude, uint8_t exclude2) {
 const int32_t worm0_color = COLOR_BRG(28, 70, 6);
 const int32_t worm_tail_color = COLOR_BRG(100, 40, 0);
 
-uint8_t worm0 = 6;
-uint8_t worm1 = 5;
-uint8_t worm2 = 4;
+int speed = 60;
 
-int speed = 30;
+uint32_t worm_color_by_speed(int speed, int idx) {
+    if (speed > 8)
+        if (idx) return worm_tail_color;
+        else return worm0_color;
+    else
+        if (speed > 5)
+            if (idx) return COLOR_BRG(150, 60, 10);
+            else return COLOR_BRG(70, 140, 20);
+        else
+            if (idx) return COLOR_BRG(255,130,80);
+            else return COLOR_BRG(80,80,200);
+}
+
+uint8_t worm0 = 6;
+uint8_t worm1 = 32;
+uint8_t worm2 = 32;
+uint8_t worm3 = 32;
+
+uint32_t frame_buffer[32];
+
+void paint_frame_buffer() {
+    for (int i = 0; i < num_leds; ++i) put_pixel(frame_buffer[i]);
+}
+void decay_frame_buffer() {
+    for (int i = 0; i < num_leds; ++i) {
+        uint32_t c = frame_buffer[i];
+        if (c != 0) {
+            uint8_t c1 = (c >> 16) & 0xff;
+            uint8_t c2 = (c >> 8) & 0xff;
+            uint8_t c3 = c & 0xff;
+            frame_buffer[i] = ((c1 >> 1) << 16) | ((c2 >> 1) << 8) | (c3 >> 1);
+        }
+    }
+}
+void set_fbpixel(uint8_t pixel, uint32_t color) {
+    if (pixel < num_leds) frame_buffer[pixel] = color;
+}
 
 void worm_moves(uint t) {
-    if (speed > 1 && t % 10 == 0 && (rand() % 10 == 0)) speed--;
+    if (speed > 4 && t % 10 == 0 && (rand() % 10 == 0)) speed-=1;
+
+    if (t % 6 == 0)
+        decay_frame_buffer();
 
     if (t % speed == 0) {
         uint8_t newPos = random_next_pos(worm0, worm1, worm2);
+        worm3 = worm2;
         worm2 = worm1;
         worm1 = worm0;
         worm0 = newPos;
-
-        for (int i = 0; i < num_leds; ++i) {
-            if (i == worm0) put_pixel(worm0_color);
-            else if (i == worm1 || i == worm2) put_pixel(worm_tail_color);
-            else put_pixel(0);
-        }
     }
+
+    set_fbpixel(worm1, worm_color_by_speed(speed, 1));
+    set_fbpixel(worm2, worm_color_by_speed(speed, 2));
+    set_fbpixel(worm3, worm_color_by_speed(speed, 3));
+
+    set_fbpixel(worm0, worm_color_by_speed(speed, 0));
+
+    paint_frame_buffer();
 }
 
 void story() {
@@ -240,7 +280,7 @@ int main() {
     while (1) {
         for (int i = 0; i < 1000; ++i) {
             worm_moves(i);
-            sleep_ms(10);
+            sleep_ms(5);
         }
         
         // for (int i = 0; i < 100; ++i) {
