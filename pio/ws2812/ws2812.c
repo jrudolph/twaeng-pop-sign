@@ -156,6 +156,59 @@ uint8_t adjacency_nodes[] =
         3, 26, 27, 30,     // for 29
     };
 
+uint8_t random_next_pos(uint8_t at, uint8_t exclude, uint8_t exclude2) {
+    uint8_t neighbors[4];
+    int num = 0;
+    int entry = adjacency_refs[at];
+    if (entry == NO_NEIGHBORS) {
+        if (at > 0) neighbors[num++] = at - 1;
+        if (at < (num_leds - 1)) neighbors[num++] = at + 1;
+    } else {
+        int ns = adjacency_nodes[entry];
+        for (int i = entry + 1; i < entry + ns + 1; i++) {
+            uint8_t target = adjacency_nodes[i];
+            //if (target != exclude && target != exclude2)
+            neighbors[num++] = target;
+        }
+    }
+    if (num == 1) return neighbors[0];
+
+    for(int i = 0; i < 10; i++) {
+        int idx = rand() % num;
+        uint8_t cand = neighbors[idx];
+        // check for exclusion criteria
+        if (cand != exclude && cand != exclude2 && cand >= 0 && cand <= num_leds)
+            return cand;
+    }
+    return neighbors[0]; // emergency exit
+}
+
+const int32_t worm0_color = COLOR_BRG(28, 70, 6);
+const int32_t worm_tail_color = COLOR_BRG(100, 40, 0);
+
+uint8_t worm0 = 6;
+uint8_t worm1 = 5;
+uint8_t worm2 = 4;
+
+int speed = 30;
+
+void worm_moves(uint t) {
+    if (speed > 1 && t % 10 == 0 && (rand() % 10 == 0)) speed--;
+
+    if (t % speed == 0) {
+        uint8_t newPos = random_next_pos(worm0, worm1, worm2);
+        worm2 = worm1;
+        worm1 = worm0;
+        worm0 = newPos;
+
+        for (int i = 0; i < num_leds; ++i) {
+            if (i == worm0) put_pixel(worm0_color);
+            else if (i == worm1 || i == worm2) put_pixel(worm_tail_color);
+            else put_pixel(0);
+        }
+    }
+}
+
 void story() {
     // worm finds the light
     // worm moves around randomly
@@ -183,28 +236,33 @@ int main() {
 
     ws2812_program_init(pio, sm, offset, PIN_TX, 800000, false);
 
-    int t = 0;
+    //int t = 0;
     while (1) {
-        for (int i = 0; i < 100; ++i) {
-            show_letter(p_1_leds, p_1_color, i);
+        for (int i = 0; i < 1000; ++i) {
+            worm_moves(i);
             sleep_ms(10);
         }
-        for (int i = 0; i < 100; ++i) {
-            show_letter(o_leds, o_color, i);
-            sleep_ms(10);
-        }
-        for (int i = 0; i < 100; ++i) {
-            show_letter(p_2_leds, p_2_color, i);
-            sleep_ms(10);
-        }
-        for (int i = 0; i < 100; ++i) {
-            show_letter(excl_leds, excl_color, i);
-            sleep_ms(10);
-        }
-        for (int i = 0; i < 100; ++i) {
-            show_all(i);
-            sleep_ms(10);
-        }
+        
+        // for (int i = 0; i < 100; ++i) {
+        //     show_letter(p_1_leds, p_1_color, i);
+        //     sleep_ms(10);
+        // }
+        // for (int i = 0; i < 100; ++i) {
+        //     show_letter(o_leds, o_color, i);
+        //     sleep_ms(10);
+        // }
+        // for (int i = 0; i < 100; ++i) {
+        //     show_letter(p_2_leds, p_2_color, i);
+        //     sleep_ms(10);
+        // }
+        // for (int i = 0; i < 100; ++i) {
+        //     show_letter(excl_leds, excl_color, i);
+        //     sleep_ms(10);
+        // }
+        // for (int i = 0; i < 100; ++i) {
+        //     show_all(i);
+        //     sleep_ms(10);
+        // }
         // int pat = rand() % count_of(pattern_table);
         // int dir = (rand() >> 30) & 1 ? 1 : -1;
         // puts(pattern_table[pat].name);
