@@ -122,6 +122,40 @@ void show_all(uint t) {
     }
 }
 
+// topology of led sign, defines which nodes are physically adjacent
+#define NO_NEIGHBORS 255
+// contains an index into adjacency_nodes per node (or 255 for no neighbors besides +/- 1)
+uint8_t adjacency_refs[] = {
+    NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, 0, NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, // - 7
+    4, 8, 13, 17, 20, NO_NEIGHBORS, 24, 28, 32, NO_NEIGHBORS, 37, 41, NO_NEIGHBORS, 43, 47, 51, // - 23
+    NO_NEIGHBORS, 55, 59, 63, 67, 71, NO_NEIGHBORS, NO_NEIGHBORS
+};
+// contains adjacent node entries
+// i + 0 = number of entries
+// i + 1..n = adjacent nodes
+uint8_t adjacency_nodes[] =
+    {
+        3, 2, 11, 4,       // for 3
+        3, 7, 9, 12,       // for 8
+        4, 8, 10, 12, 18,  // for 9
+        3, 9, 11, 18,      // for 10
+        2, 3, 10,          // for 11
+        3, 8, 9, 13,       // for 12
+        3, 13, 15, 22,     // for 14
+        3, 14, 16, 22,     // for 15
+        4, 15, 17, 21, 28, // for 16
+        3, 9, 10, 17,      // for 18
+        1, 20,             // for 19
+        3, 16, 20, 28,     // for 21
+        3, 14, 15, 22,     // for 22
+        3, 22, 24, 25,     // for 23
+        3, 23, 24, 26,     // for 25
+        3, 25, 27, 29,     // for 26
+        3, 26, 28, 29,     // for 27
+        3, 16, 21, 27,     // for 28
+        3, 26, 27, 30,     // for 29
+    };
+
 void story() {
     // worm finds the light
     // worm moves around randomly
