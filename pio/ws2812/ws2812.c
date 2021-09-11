@@ -325,7 +325,7 @@ void fireworks() {
         .path = {0,1,2,3,4,5}
     };
     struct rocket_t r2 = {
-        .offset_ms = 280,
+        .offset_ms = 400,
         .pos_idx = 0,
         .state = 0,
         .color = COLOR_BRG(25, 5 , 0),
@@ -335,7 +335,7 @@ void fireworks() {
         .path = {19,20,21,16,15,14}
     };
     struct rocket_t r3 = {
-        .offset_ms = 560,
+        .offset_ms = 800,
         .pos_idx = 0,
         .state = 0,
         .color = COLOR_BRG(25, 5 , 0),
@@ -344,21 +344,21 @@ void fireworks() {
         .path_len = 5,
         .path = {31,30,29,26,25}
     };
-        struct rocket_t r4 = {
-        .offset_ms = 840,
+    struct rocket_t r4 = {
+        .offset_ms = 1200,
         .pos_idx = 0,
         .state = 0,
         .color = COLOR_BRG(25, 5 , 0),
         .letter_color = excl_color,
         .letter_leds = &excl_leds,
-        .path_len = 6,
-        .path = {31,30,29,26,25,24}
+        .path_len = 5,
+        .path = {31,30,29,26,25}
     };
 
-    for (int t = 1; t <= 2500; ++t) {
+    for (int t = 1; t <= 2700; ++t) {
         if (t % 40 == 0) decay_frame_buffer();
         
-        if (t % 140 == 0) {
+        if (t % 200 == 0) {
             rocket_step(&r1, t);
             rocket_step(&r2, t);
             rocket_step(&r3, t);
