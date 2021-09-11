@@ -12,7 +12,7 @@
 #include "hardware/clocks.h"
 #include "ws2812.pio.h"
 
-#define COLOR_BRG(R, G, B) ((G << 16) | (R << 8) | B)
+#define COLOR_BRG(R, G, B) (((G) << 16) | ((R) << 8) | (B))
 
 static inline void put_pixel(uint32_t pixel_grb) {
     pio_sm_put_blocking(pio0, 0, pixel_grb << 8u);
@@ -92,7 +92,7 @@ const uint32_t p_1_o_color = COLOR_BRG(20, 0, 40);
 const uint32_t o_color = COLOR_BRG(12, 35, 120);
 const uint32_t o_p2_color = COLOR_BRG(28, 70, 6);
 const uint32_t p_2_color = COLOR_BRG(200, 40, 0); ///* 23, 167, 254 */));// 20,135,206
-const uint32_t p_2_excl_color = COLOR_BRG(90, 13, 1);
+const uint32_t p_2_excl_color = COLOR_BRG(150, 8, 1);
 const uint32_t excl_color = COLOR_BRG(150, 12, 8);
 
 void show_letter(const int *letter, uint32_t color, uint t) {
@@ -188,17 +188,36 @@ const int32_t worm_tail_color = COLOR_BRG(100, 40, 0);
 
 int speed = 60;
 
-uint32_t worm_color_by_speed(int speed, int idx) {
-    if (speed > 8)
+#define max(a,b) ((a) > (b) ? (a) : (b))
+#define min(a,b) ((a) < (b) ? (a) : (b))
+
+// macro doesn't work for some reason?
+// #define INTERP(TFROM, TTO, YFROM, YTO, T)  ((YFROM) + ((YTO) - (YFROM)) * (min((T), (TTO)) - (TFROM)) / ((TTO) - (TFROM)))
+int interp(int TFROM, int TTO, int YFROM, int YTO, int T) {
+    return ((YFROM) + ((YTO) - (YFROM)) * (min((T), (TTO)) - (TFROM)) / ((TTO) - (TFROM)));
+}
+
+uint32_t worm_color_by_speed(int speed, uint32_t t, int idx) {
+    if (speed > 15)
         if (idx) return worm_tail_color;
         else return worm0_color;
     else
-        if (speed > 5)
+        if (speed > 7)
             if (idx) return COLOR_BRG(150, 60, 10);
             else return COLOR_BRG(70, 140, 20);
+        else if (t < 3500)
+            if (idx) return COLOR_BRG(255, 130, 80);
+            else return COLOR_BRG(40, 20, 200);
+        else if (t < 4000)
+            if (idx)
+                return COLOR_BRG(interp(3500,4000, 200, 50, t), interp(3500, 4000, 130, 0, t), interp(3500, 4000, 80, 0, t));
+            else
+                return COLOR_BRG(interp(3500,4000, 40, 255, t),interp(3500,4000,200,0,t),interp(3500,4000,200,0,t));
         else
-            if (idx) return COLOR_BRG(255,130,80);
-            else return COLOR_BRG(80,80,200);
+            if (idx)
+                return COLOR_BRG(interp(4000,4500, 50, 5, t), 0,0);
+            else
+                return COLOR_BRG(interp(4000,4500, 255, 50, t),0,0);
 }
 
 uint8_t worm0 = 6;
@@ -226,8 +245,8 @@ void set_fbpixel(uint8_t pixel, uint32_t color) {
     if (pixel < num_leds) frame_buffer[pixel] = color;
 }
 
-void worm_moves(uint t) {
-    if (speed > 4 && t % 10 == 0 && (rand() % 10 == 0)) speed-=1;
+void worm_moves(uint32_t t) {
+    if (speed > 4 && t % 60 == 0) speed-=1;
 
     if (t % 6 == 0)
         decay_frame_buffer();
@@ -240,11 +259,11 @@ void worm_moves(uint t) {
         worm0 = newPos;
     }
 
-    set_fbpixel(worm1, worm_color_by_speed(speed, 1));
-    set_fbpixel(worm2, worm_color_by_speed(speed, 2));
-    set_fbpixel(worm3, worm_color_by_speed(speed, 3));
+    set_fbpixel(worm1, worm_color_by_speed(speed, t, 1));
+    set_fbpixel(worm2, worm_color_by_speed(speed, t, 2));
+    set_fbpixel(worm3, worm_color_by_speed(speed, t, 3));
 
-    set_fbpixel(worm0, worm_color_by_speed(speed, 0));
+    set_fbpixel(worm0, worm_color_by_speed(speed, t, 0));
 
     paint_frame_buffer();
 }
@@ -277,32 +296,32 @@ int main() {
     ws2812_program_init(pio, sm, offset, PIN_TX, 800000, false);
 
     //int t = 0;
-    while (1) {
-        for (int i = 0; i < 1000; ++i) {
+    //while (1) {
+        for (uint32_t i = 0; i < 5000; ++i) {
             worm_moves(i);
             sleep_ms(5);
         }
         
-        // for (int i = 0; i < 100; ++i) {
-        //     show_letter(p_1_leds, p_1_color, i);
-        //     sleep_ms(10);
-        // }
-        // for (int i = 0; i < 100; ++i) {
-        //     show_letter(o_leds, o_color, i);
-        //     sleep_ms(10);
-        // }
-        // for (int i = 0; i < 100; ++i) {
-        //     show_letter(p_2_leds, p_2_color, i);
-        //     sleep_ms(10);
-        // }
-        // for (int i = 0; i < 100; ++i) {
-        //     show_letter(excl_leds, excl_color, i);
-        //     sleep_ms(10);
-        // }
-        // for (int i = 0; i < 100; ++i) {
-        //     show_all(i);
-        //     sleep_ms(10);
-        // }
+        for (int i = 0; i < 100; ++i) {
+            show_letter(p_1_leds, p_1_color, i);
+            sleep_ms(10);
+        }
+        for (int i = 0; i < 100; ++i) {
+            show_letter(o_leds, o_color, i);
+            sleep_ms(10);
+        }
+        for (int i = 0; i < 100; ++i) {
+            show_letter(p_2_leds, p_2_color, i);
+            sleep_ms(10);
+        }
+        for (int i = 0; i < 100; ++i) {
+            show_letter(excl_leds, excl_color, i);
+            sleep_ms(10);
+        }
+        for (int i = 0; i < 100; ++i) {
+            show_all(i);
+            sleep_ms(10);
+        }
         // int pat = rand() % count_of(pattern_table);
         // int dir = (rand() >> 30) & 1 ? 1 : -1;
         // puts(pattern_table[pat].name);
@@ -312,5 +331,5 @@ int main() {
         //     sleep_ms(10);
         //     t += dir;
         // }
-    }
+    //}
 }
