@@ -292,6 +292,8 @@ struct rocket_t {
     const int *letter_leds;
     uint8_t path_len;
     uint8_t path[6];
+    bool fizzle;
+    uint8_t fizzle_leds[4];
 };
 
 void rocket_step(struct rocket_t *r, int t) {
@@ -299,80 +301,104 @@ void rocket_step(struct rocket_t *r, int t) {
     if (r->pos_idx < r->path_len - 1) {
         r->pos_idx++;
         r->color = COLOR_BRG(25 << ((t - r->offset_ms) / 300), 5 << ((t - r->offset_ms) / 300), 0);
+    } else if (r->fizzle) {
+        r->state = 1;
+        for (int i = 0; i < 2;) {
+            int cand = rand() % num_leds;
+            if (r->letter_leds[cand])
+                r->fizzle_leds[i++] = cand;
+        }
     } else if (r->state == 0) {
         r->state = 1;
     }
 }
-void rocket_paint(struct rocket_t *r) {
+void rocket_paint(struct rocket_t *r, int t) {
     if (r->state == 0) 
         set_fbpixel(r->path[r->pos_idx], r->color);
-    else if (r->state == 1) {
+    else if (r->fizzle) {
+        for (int i = 0; i < 2; i++) {
+            set_fbpixel(r->fizzle_leds[i], COLOR_BRG(rand()%255,rand()%130,rand()%80));//COLOR_BRG(255>>intensity,130>>intensity,80>>intensity));
+        }
+    } else if (r->state == 1) {
         for (int i = 0; i < num_leds; i++)
             if (r->letter_leds[i]) set_fbpixel(i, r->letter_color);
         r->state = 2;
     }
 }
+struct rocket_t r1 = {
+    .offset_ms = 0,
+    .pos_idx = 0,
+    .state = 0,
+    .color = COLOR_BRG(25, 5 , 0),
+    .letter_color = p_1_color,
+    .letter_leds = &p_1_leds,
+    .path_len = 6,
+    .path = {0,1,2,3,4,5},
+    .fizzle = true
+};
+struct rocket_t r2 = {
+    .offset_ms = 400,
+    .pos_idx = 0,
+    .state = 0,
+    .color = COLOR_BRG(25, 5 , 0),
+    .letter_color = o_color,
+    .letter_leds = &o_leds,
+    .path_len = 6,
+    .path = {19,20,21,16,15,14},
+    .fizzle = true
+};
+struct rocket_t r3 = {
+    .offset_ms = 800,
+    .pos_idx = 0,
+    .state = 0,
+    .color = COLOR_BRG(25, 5 , 0),
+    .letter_color = p_2_color,
+    .letter_leds = &p_2_leds,
+    .path_len = 5,
+    .path = {31,30,29,26,25},
+    .fizzle = true
+};
+struct rocket_t r4 = {
+    .offset_ms = 1200,
+    .pos_idx = 0,
+    .state = 0,
+    .color = COLOR_BRG(25, 5 , 0),
+    .letter_color = excl_color,
+    .letter_leds = &excl_leds,
+    .path_len = 5,
+    .path = {31,30,29,26,25},
+    .fizzle = true
+};
+struct rocket_t *rockets[] = {&r1,&r2,&r3,&r4};
 
-void fireworks() {
-    struct rocket_t r1 = {
-        .offset_ms = 0,
-        .pos_idx = 0,
-        .state = 0,
-        .color = COLOR_BRG(25, 5 , 0),
-        .letter_color = p_1_color,
-        .letter_leds = &p_1_leds,
-        .path_len = 6,
-        .path = {0,1,2,3,4,5}
-    };
-    struct rocket_t r2 = {
-        .offset_ms = 400,
-        .pos_idx = 0,
-        .state = 0,
-        .color = COLOR_BRG(25, 5 , 0),
-        .letter_color = o_color,
-        .letter_leds = &o_leds,
-        .path_len = 6,
-        .path = {19,20,21,16,15,14}
-    };
-    struct rocket_t r3 = {
-        .offset_ms = 800,
-        .pos_idx = 0,
-        .state = 0,
-        .color = COLOR_BRG(25, 5 , 0),
-        .letter_color = p_2_color,
-        .letter_leds = &p_2_leds,
-        .path_len = 5,
-        .path = {31,30,29,26,25}
-    };
-    struct rocket_t r4 = {
-        .offset_ms = 1200,
-        .pos_idx = 0,
-        .state = 0,
-        .color = COLOR_BRG(25, 5 , 0),
-        .letter_color = excl_color,
-        .letter_leds = &excl_leds,
-        .path_len = 5,
-        .path = {31,30,29,26,25}
-    };
+void fireworks_run(bool fizzle) {
+    // reset rockets
+    for (int i = 0; i < 4; i++) {
+        rockets[i]->state = 0;
+        rockets[i]->pos_idx = 0;
+        rockets[i]->color = COLOR_BRG(25, 5 , 0);
+        rockets[i]->fizzle = fizzle;
+    }
 
     for (int t = 1; t <= 2700; ++t) {
         if (t % 40 == 0) decay_frame_buffer();
         
         if (t % 200 == 0) {
-            rocket_step(&r1, t);
-            rocket_step(&r2, t);
-            rocket_step(&r3, t);
-            rocket_step(&r4, t);
+            for (int i = 0; i < 4; i++)
+                rocket_step(rockets[i], t);
         }
-        rocket_paint(&r1);
-        rocket_paint(&r2);
-        rocket_paint(&r3);
-        rocket_paint(&r4);
+        for (int i = 0; i < 4; i++)
+            rocket_paint(rockets[i], t);
 
         paint_frame_buffer();
 
         sleep_ms(1);
     }
+}
+void fireworks() {
+    fireworks_run(false);
+    fireworks_run(true);
+    fireworks_run(false);
 }
 
 
@@ -389,6 +415,7 @@ int main() {
     ws2812_program_init(pio, sm, offset, PIN_TX, 800000, false);
 
     fireworks();
+    
     //int t = 0;
     //while (1) {
         // for (uint32_t i = 0; i < 5000; ++i) {
