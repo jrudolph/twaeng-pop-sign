@@ -275,13 +275,106 @@ void story() {
     // worm overheats
     // worm heartbeats
     // worm grows a sparkling longer tail
-    // fade out
+    // worm paints letters
     // fireworks
     // p - o - p - !
     // pop! pulsating
     // pop! static
     // (smiley)
 }
+
+struct rocket_t {
+    uint32_t offset_ms;
+    uint8_t pos_idx;
+    uint8_t state;
+    uint32_t color;
+    uint32_t letter_color;
+    const int *letter_leds;
+    uint8_t path_len;
+    uint8_t path[6];
+};
+
+void rocket_step(struct rocket_t *r, int t) {
+    if (t < r->offset_ms) return;
+    if (r->pos_idx < r->path_len - 1) {
+        r->pos_idx++;
+        r->color = COLOR_BRG(25 << ((t - r->offset_ms) / 300), 5 << ((t - r->offset_ms) / 300), 0);
+    } else if (r->state == 0) {
+        r->state = 1;
+    }
+}
+void rocket_paint(struct rocket_t *r) {
+    if (r->state == 0) 
+        set_fbpixel(r->path[r->pos_idx], r->color);
+    else if (r->state == 1) {
+        for (int i = 0; i < num_leds; i++)
+            if (r->letter_leds[i]) set_fbpixel(i, r->letter_color);
+        r->state = 2;
+    }
+}
+
+void fireworks() {
+    struct rocket_t r1 = {
+        .offset_ms = 0,
+        .pos_idx = 0,
+        .state = 0,
+        .color = COLOR_BRG(25, 5 , 0),
+        .letter_color = p_1_color,
+        .letter_leds = &p_1_leds,
+        .path_len = 6,
+        .path = {0,1,2,3,4,5}
+    };
+    struct rocket_t r2 = {
+        .offset_ms = 280,
+        .pos_idx = 0,
+        .state = 0,
+        .color = COLOR_BRG(25, 5 , 0),
+        .letter_color = o_color,
+        .letter_leds = &o_leds,
+        .path_len = 6,
+        .path = {19,20,21,16,15,14}
+    };
+    struct rocket_t r3 = {
+        .offset_ms = 560,
+        .pos_idx = 0,
+        .state = 0,
+        .color = COLOR_BRG(25, 5 , 0),
+        .letter_color = p_2_color,
+        .letter_leds = &p_2_leds,
+        .path_len = 5,
+        .path = {31,30,29,26,25}
+    };
+        struct rocket_t r4 = {
+        .offset_ms = 840,
+        .pos_idx = 0,
+        .state = 0,
+        .color = COLOR_BRG(25, 5 , 0),
+        .letter_color = excl_color,
+        .letter_leds = &excl_leds,
+        .path_len = 6,
+        .path = {31,30,29,26,25,24}
+    };
+
+    for (int t = 1; t <= 2500; ++t) {
+        if (t % 40 == 0) decay_frame_buffer();
+        
+        if (t % 140 == 0) {
+            rocket_step(&r1, t);
+            rocket_step(&r2, t);
+            rocket_step(&r3, t);
+            rocket_step(&r4, t);
+        }
+        rocket_paint(&r1);
+        rocket_paint(&r2);
+        rocket_paint(&r3);
+        rocket_paint(&r4);
+
+        paint_frame_buffer();
+
+        sleep_ms(1);
+    }
+}
+
 
 int main() {
     //set_sys_clock_48();
@@ -295,14 +388,15 @@ int main() {
 
     ws2812_program_init(pio, sm, offset, PIN_TX, 800000, false);
 
+    fireworks();
     //int t = 0;
     //while (1) {
-        for (uint32_t i = 0; i < 5000; ++i) {
-            worm_moves(i);
-            sleep_ms(5);
-        }
+        // for (uint32_t i = 0; i < 5000; ++i) {
+        //     worm_moves(i);
+        //     sleep_ms(5);
+        // }
         
-        for (int i = 0; i < 100; ++i) {
+        /* for (int i = 0; i < 100; ++i) {
             show_letter(p_1_leds, p_1_color, i);
             sleep_ms(10);
         }
@@ -321,7 +415,7 @@ int main() {
         for (int i = 0; i < 100; ++i) {
             show_all(i);
             sleep_ms(10);
-        }
+        } */
         // int pat = rand() % count_of(pattern_table);
         // int dir = (rand() >> 30) & 1 ? 1 : -1;
         // puts(pattern_table[pat].name);
