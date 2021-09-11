@@ -231,14 +231,8 @@ void paint_frame_buffer() {
     for (int i = 0; i < num_leds; ++i) put_pixel(frame_buffer[i]);
 }
 void decay_frame_buffer() {
-    for (int i = 0; i < num_leds; ++i) {
-        uint32_t c = frame_buffer[i];
-        if (c != 0) {
-            uint8_t c1 = (c >> 16) & 0xff;
-            uint8_t c2 = (c >> 8) & 0xff;
-            uint8_t c3 = c & 0xff;
-            frame_buffer[i] = ((c1 >> 1) << 16) | ((c2 >> 1) << 8) | (c3 >> 1);
-        }
+    for (int i = 0; i < num_leds * 8; ++i) {
+        ((uint8_t*)frame_buffer)[i] = (((uint16_t)(((uint8_t*)frame_buffer)[i])) * 13)>>4;
     }
 }
 void set_fbpixel(uint8_t pixel, uint32_t color) {
@@ -337,7 +331,7 @@ struct rocket_t r1 = {
     .fizzle = true
 };
 struct rocket_t r2 = {
-    .offset_ms = 400,
+    .offset_ms = 280,
     .pos_idx = 0,
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
@@ -348,7 +342,7 @@ struct rocket_t r2 = {
     .fizzle = true
 };
 struct rocket_t r3 = {
-    .offset_ms = 800,
+    .offset_ms = 560,
     .pos_idx = 0,
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
@@ -359,7 +353,7 @@ struct rocket_t r3 = {
     .fizzle = true
 };
 struct rocket_t r4 = {
-    .offset_ms = 1200,
+    .offset_ms = 840,
     .pos_idx = 0,
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
@@ -380,10 +374,10 @@ void fireworks_run(bool fizzle) {
         rockets[i]->fizzle = fizzle;
     }
 
-    for (int t = 1; t <= 2700; ++t) {
-        if (t % 40 == 0) decay_frame_buffer();
+    for (int t = 1; t <= 2000; ++t) {
+        if (t % 20 == 0) decay_frame_buffer();
         
-        if (t % 200 == 0) {
+        if (t % 140 == 0) {
             for (int i = 0; i < 4; i++)
                 rocket_step(rockets[i], t);
         }
