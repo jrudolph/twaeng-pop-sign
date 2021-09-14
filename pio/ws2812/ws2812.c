@@ -81,10 +81,10 @@ const int p_2_len = 9;
 const int o_off = p_len;
 const int po_mix_idx = 9; // led 9 is part of o
 const int num_leds = 32;
-const int p_1_leds[] = {1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int p_1_leds[] = {0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 const int o_leds[] =   {0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0};
 const int o_p_2_leds[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // only want that middle one
-const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,1,0,1,1,1,1,0,0,0};
+const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,0,1,1,1,1,0,0,0};
 const int excl_leds[]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1};
 
 const uint32_t p_1_color = COLOR_BRG(240, 5, 2);
@@ -119,6 +119,8 @@ void show_all(uint t) {
             put_pixel(p_2_color);
         else if (excl_leds[i])
             put_pixel(excl_color);
+        else
+            put_pixel(0);
     }
 }
 
@@ -215,9 +217,9 @@ uint32_t worm_color_by_speed(int speed, uint32_t t, int idx) {
                 return COLOR_BRG(interp(3500,4000, 40, 255, t),interp(3500,4000,200,0,t),interp(3500,4000,200,0,t));
         else
             if (idx)
-                return COLOR_BRG(interp(4000,4500, 50, 5, t), 0,0);
+                return COLOR_BRG(interp(4000,4500, 50, 0, t), 0,0);
             else
-                return COLOR_BRG(interp(4000,4500, 255, 50, t),0,0);
+                return COLOR_BRG(interp(4000,4500, 255, 0, t),0,0);
 }
 
 uint8_t worm0 = 6;
@@ -231,7 +233,7 @@ void paint_frame_buffer() {
     for (int i = 0; i < num_leds; ++i) put_pixel(frame_buffer[i]);
 }
 void decay_frame_buffer() {
-    for (int i = 0; i < num_leds * 8; ++i) {
+    for (int i = 0; i < num_leds * 4; ++i) {
         ((uint8_t*)frame_buffer)[i] = (((uint16_t)(((uint8_t*)frame_buffer)[i])) * 13)>>4;
     }
 }
@@ -395,6 +397,61 @@ void fireworks() {
     fireworks_run(false);
 }
 
+void put_faded_pixel(uint32_t color, int fade) {
+    uint32_t faded =
+        (((color >> 16) & 0xff) >> (8 - fade)) << 16 |
+        (((color >> 8) & 0xff) >> (8 - fade)) << 8 |
+        (((color ) & 0xff) >> (8 - fade));
+    put_pixel(faded);
+    //put_pixel(COLOR_BRG(255,130,80));
+}
+void fade_up_letters() {
+    for (int t = 0; t < 8; ++t) {
+        for (int i = 0; i < num_leds; ++i) {
+            if (p_1_leds[i] && o_leds[i])
+                put_faded_pixel(p_1_o_color, t);
+            else if (p_1_leds[i])
+                put_faded_pixel(p_1_color, t);
+            else if (o_p_2_leds[i])
+                put_faded_pixel(o_p2_color, t);
+            else if (o_leds[i])
+                put_faded_pixel(o_color, t);
+            else if (p_2_leds[i] && excl_leds[i])
+                put_faded_pixel(p_2_excl_color, t);
+            else if (p_2_leds[i])
+                put_faded_pixel(p_2_color, t);
+            else if (excl_leds[i])
+                put_faded_pixel(excl_color, t);
+            else put_pixel(0);
+        }
+
+        sleep_ms(40);
+    }
+}
+
+void glowing_letters() {
+    for (int t = 0; t < 50; ++t) {
+        for (int i = 0; i < num_leds; ++i) {
+            if (p_1_leds[i] && o_leds[i])
+                put_faded_pixel(p_1_o_color, rand() % 2 + 6);
+            else if (p_1_leds[i])
+                put_faded_pixel(p_1_color, rand() % 2 + 6);
+            else if (o_p_2_leds[i])
+                put_faded_pixel(o_p2_color, rand() % 2 + 6);
+            else if (o_leds[i])
+                put_faded_pixel(o_color, rand() % 2 + 6);
+            else if (p_2_leds[i] && excl_leds[i])
+                put_faded_pixel(p_2_excl_color, rand() % 2 + 6);
+            else if (p_2_leds[i])
+                put_faded_pixel(p_2_color, rand() % 2 + 6);
+            else if (excl_leds[i])
+                put_faded_pixel(excl_color, rand() % 2 + 6);
+            else put_pixel(0);
+        }
+
+        sleep_ms(200);
+    }
+}
 
 int main() {
     //set_sys_clock_48();
@@ -408,43 +465,55 @@ int main() {
 
     ws2812_program_init(pio, sm, offset, PIN_TX, 800000, false);
 
-    fireworks();
-    
-    //int t = 0;
-    //while (1) {
-        // for (uint32_t i = 0; i < 5000; ++i) {
-        //     worm_moves(i);
-        //     sleep_ms(5);
-        // }
+    while(1) {
+        fade_up_letters();
+        glowing_letters(0);
+        fireworks();
+        glowing_letters(0);
+
+        speed = 60;
+        for (uint32_t i = 0; i < 4500; ++i) {
+                worm_moves(i);
+                sleep_ms(5);
+        }
+    }
+
+    // while (1) {
+    //     speed = 60;
+    //     for (uint32_t i = 0; i < 5000; ++i) {
+    //          worm_moves(i);
+    //          sleep_ms(5);
+    //     }
+    //     fireworks();
+    // }
         
-        /* for (int i = 0; i < 100; ++i) {
-            show_letter(p_1_leds, p_1_color, i);
-            sleep_ms(10);
-        }
-        for (int i = 0; i < 100; ++i) {
-            show_letter(o_leds, o_color, i);
-            sleep_ms(10);
-        }
-        for (int i = 0; i < 100; ++i) {
-            show_letter(p_2_leds, p_2_color, i);
-            sleep_ms(10);
-        }
-        for (int i = 0; i < 100; ++i) {
-            show_letter(excl_leds, excl_color, i);
-            sleep_ms(10);
-        }
-        for (int i = 0; i < 100; ++i) {
-            show_all(i);
-            sleep_ms(10);
-        } */
-        // int pat = rand() % count_of(pattern_table);
-        // int dir = (rand() >> 30) & 1 ? 1 : -1;
-        // puts(pattern_table[pat].name);
-        // puts(dir == 1 ? "(forward)" : "(backward)");
-        // for (int i = 0; i < 1000; ++i) {
-        //     pattern_table[pat].pat(num_leds, t);
-        //     sleep_ms(10);
-        //     t += dir;
-        // }
-    //}
+    //     /* for (int i = 0; i < 100; ++i) {
+    //         show_letter(p_1_leds, p_1_color, i);
+    //         sleep_ms(10);
+    //     }
+    //     for (int i = 0; i < 100; ++i) {
+    //         show_letter(o_leds, o_color, i);
+    //         sleep_ms(10);
+    //     }
+    //     for (int i = 0; i < 100; ++i) {
+    //         show_letter(p_2_leds, p_2_color, i);
+    //         sleep_ms(10);
+    //     }
+    //     for (int i = 0; i < 100; ++i) {
+    //         show_letter(excl_leds, excl_color, i);
+    //         sleep_ms(10);
+    //     }*/
+    //     fade_up_letters();
+    //     sleep_ms(60000);
+        
+    //     // int pat = rand() % count_of(pattern_table);
+    //     // int dir = (rand() >> 30) & 1 ? 1 : -1;
+    //     // puts(pattern_table[pat].name);
+    //     // puts(dir == 1 ? "(forward)" : "(backward)");
+    //     // for (int i = 0; i < 1000; ++i) {
+    //     //     pattern_table[pat].pat(num_leds, t);
+    //     //     sleep_ms(10);
+    //     //     t += dir;
+    //     // }
+    // }
 }
