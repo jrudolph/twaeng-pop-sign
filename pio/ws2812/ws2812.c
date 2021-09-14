@@ -73,7 +73,7 @@ const struct {
         //{pattern_greys,   "Greys"},
 };
 
-const int PIN_TX = 0;
+const int PIN_TX = 28;
 
 const int p_len = 12; // first p has 12 leds
 const int o_len = 7;  // o has 7 leds
