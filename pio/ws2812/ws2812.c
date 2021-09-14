@@ -230,25 +230,29 @@ uint8_t worm3 = 32;
 uint32_t frame_buffer[32];
 
 uint32_t background[32];
-void init_background() {
+
+void paint_letters_to_buffer(uint32_t *buffer) {
     for (int i = 0; i < num_leds; ++i) {
         if (p_1_leds[i] && o_leds[i])
-            background[i] = (p_1_o_color);
+            buffer[i] = (p_1_o_color);
         else if (p_1_leds[i])
-            background[i] = (p_1_color);
+            buffer[i] = (p_1_color);
         else if (o_p_2_leds[i])
-            background[i] = (o_p2_color);
+            buffer[i] = (o_p2_color);
         else if (o_leds[i])
-            background[i] = (o_color);
+            buffer[i] = (o_color);
         else if (p_2_leds[i] && excl_leds[i])
-            background[i] = (p_2_excl_color);
+            buffer[i] = (p_2_excl_color);
         else if (p_2_leds[i])
-            background[i] = (p_2_color);
+            buffer[i] = (p_2_color);
         else if (excl_leds[i])
-            background[i] = (excl_color);
+            buffer[i] = (excl_color);
         else
-            background[i] = (0);
+            buffer[i] = (0);
     }
+}
+void init_background() {
+    paint_letters_to_buffer(background);
     for (int i = 0; i < num_leds * 4; ++i) {
         // background is much lower intensity
         ((uint8_t*)background)[i] = max(1, (((uint16_t)(((uint8_t*)background)[i])))>>4);
@@ -509,6 +513,7 @@ int main() {
         glowing_letters(0);
 
         speed = 60;
+        paint_letters_to_buffer(frame_buffer); // for a smooth fading to background
         for (uint32_t i = 0; i < 4800; ++i) {
                 worm_moves(i);
                 sleep_ms(5);
