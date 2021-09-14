@@ -268,7 +268,7 @@ void paint_frame_buffer() {
 }
 void decay_frame_buffer() {
     for (int i = 0; i < num_leds * 4; ++i) {
-        ((uint8_t*)frame_buffer)[i] = (((uint16_t)(((uint8_t*)frame_buffer)[i])) * 13)>>4;
+        ((uint8_t*)frame_buffer)[i] = (((uint16_t)(((uint8_t*)frame_buffer)[i])) * 14)>>4; // 14/16
     }
 }
 void set_fbpixel(uint8_t pixel, uint32_t color) {
@@ -432,12 +432,9 @@ void fireworks() {
 }
 
 void put_faded_pixel(uint32_t color, int fade) {
-    uint32_t faded =
-        (((color >> 16) & 0xff) >> (8 - fade)) << 16 |
-        (((color >> 8) & 0xff) >> (8 - fade)) << 8 |
-        (((color ) & 0xff) >> (8 - fade));
-    put_pixel(faded);
-    //put_pixel(COLOR_BRG(255,130,80));
+    for (int i = 0; i < 4; ++i)
+        ((uint8_t*)&color)[i] = (((uint16_t)(((uint8_t*)&color)[i])) * (32 - fade))>>5;
+    put_pixel(color);
 }
 void fade_up_letters() {
     for (int t = 0; t < 8; ++t) {
@@ -463,27 +460,30 @@ void fade_up_letters() {
     }
 }
 
+const int flicker = 6;
+
 void glowing_letters() {
-    for (int t = 0; t < 50; ++t) {
+
+    for (int t = 0; t < 100; ++t) {
         for (int i = 0; i < num_leds; ++i) {
             if (p_1_leds[i] && o_leds[i])
-                put_faded_pixel(p_1_o_color, rand() % 2 + 6);
+                put_faded_pixel(p_1_o_color, rand() % flicker);
             else if (p_1_leds[i])
-                put_faded_pixel(p_1_color, rand() % 2 + 6);
+                put_faded_pixel(p_1_color, rand() % flicker);
             else if (o_p_2_leds[i])
-                put_faded_pixel(o_p2_color, rand() % 2 + 6);
+                put_faded_pixel(o_p2_color, rand() % flicker);
             else if (o_leds[i])
-                put_faded_pixel(o_color, rand() % 2 + 6);
+                put_faded_pixel(o_color, rand() % flicker);
             else if (p_2_leds[i] && excl_leds[i])
-                put_faded_pixel(p_2_excl_color, rand() % 2 + 6);
+                put_faded_pixel(p_2_excl_color, rand() % flicker);
             else if (p_2_leds[i])
-                put_faded_pixel(p_2_color, rand() % 2 + 6);
+                put_faded_pixel(p_2_color, rand() % flicker);
             else if (excl_leds[i])
-                put_faded_pixel(excl_color, rand() % 2 + 6);
+                put_faded_pixel(excl_color, rand() % flicker);
             else put_pixel(0);
         }
 
-        sleep_ms(200);
+        sleep_ms(100);
     }
 }
 
