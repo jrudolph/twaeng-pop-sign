@@ -217,9 +217,9 @@ uint32_t worm_color_by_speed(int speed, uint32_t t, int idx) {
                 return COLOR_BRG(interp(3500,4000, 40, 255, t),interp(3500,4000,200,0,t),interp(3500,4000,200,0,t));
         else
             if (idx)
-                return COLOR_BRG(interp(4000,4500, 50, 0, t), 0,0);
+                return COLOR_BRG(interp(4000,4800, 50, 10, t), 0,0);
             else
-                return COLOR_BRG(interp(4000,4500, 255, 0, t),0,0);
+                return COLOR_BRG(interp(4000,4800, 255, 20, t),0,0);
 }
 
 uint8_t worm0 = 6;
@@ -228,6 +228,40 @@ uint8_t worm2 = 32;
 uint8_t worm3 = 32;
 
 uint32_t frame_buffer[32];
+
+uint32_t background[32];
+void init_background() {
+    for (int i = 0; i < num_leds; ++i) {
+        if (p_1_leds[i] && o_leds[i])
+            background[i] = (p_1_o_color);
+        else if (p_1_leds[i])
+            background[i] = (p_1_color);
+        else if (o_p_2_leds[i])
+            background[i] = (o_p2_color);
+        else if (o_leds[i])
+            background[i] = (o_color);
+        else if (p_2_leds[i] && excl_leds[i])
+            background[i] = (p_2_excl_color);
+        else if (p_2_leds[i])
+            background[i] = (p_2_color);
+        else if (excl_leds[i])
+            background[i] = (excl_color);
+        else
+            background[i] = (0);
+    }
+    for (int i = 0; i < num_leds * 4; ++i) {
+        // background is much lower intensity
+        ((uint8_t*)background)[i] = max(1, (((uint16_t)(((uint8_t*)background)[i])))>>4);
+    }
+}
+uint32_t paint_buffer[32];
+void paint_mixed() {
+    for (int i = 0; i < num_leds * 4; ++i) {
+        ((uint8_t*)paint_buffer)[i] =
+            ((((uint16_t)(((uint8_t*)frame_buffer)[i]))) + (((uint16_t)(((uint8_t*)background)[i]))))>>1;
+    }
+    for (int i = 0; i < num_leds; ++i) put_pixel(paint_buffer[i]);
+}
 
 void paint_frame_buffer() {
     for (int i = 0; i < num_leds; ++i) put_pixel(frame_buffer[i]);
@@ -261,7 +295,7 @@ void worm_moves(uint32_t t) {
 
     set_fbpixel(worm0, worm_color_by_speed(speed, t, 0));
 
-    paint_frame_buffer();
+    paint_mixed();
 }
 
 void story() {
@@ -465,14 +499,17 @@ int main() {
 
     ws2812_program_init(pio, sm, offset, PIN_TX, 800000, false);
 
+    init_background();
+
     while(1) {
         fade_up_letters();
         glowing_letters(0);
         fireworks();
+        fade_up_letters();
         glowing_letters(0);
 
         speed = 60;
-        for (uint32_t i = 0; i < 4500; ++i) {
+        for (uint32_t i = 0; i < 4800; ++i) {
                 worm_moves(i);
                 sleep_ms(5);
         }
