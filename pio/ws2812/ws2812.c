@@ -382,7 +382,7 @@ struct rocket_t r2 = {
     .fizzle = true
 };
 struct rocket_t r3 = {
-    .offset_ms = 560,
+    .offset_ms = 700,
     .pos_idx = 0,
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
