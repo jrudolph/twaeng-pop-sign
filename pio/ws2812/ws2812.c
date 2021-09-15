@@ -255,7 +255,7 @@ void init_background() {
     paint_letters_to_buffer(background);
     for (int i = 0; i < num_leds * 4; ++i) {
         // background is much lower intensity
-        ((uint8_t*)background)[i] = max(1, (((uint16_t)(((uint8_t*)background)[i])))>>4);
+        ((uint8_t*)background)[i] = max(1, (((uint16_t)(((uint8_t*)background)[i])))>>3);
     }
 }
 uint32_t paint_buffer[32];
