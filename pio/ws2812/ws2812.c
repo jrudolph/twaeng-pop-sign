@@ -353,10 +353,10 @@ void rocket_paint(struct rocket_t *r, int t) {
         for (int i = 0; i < 2; i++) {
             set_fbpixel(r->fizzle_leds[i], COLOR_BRG(rand()%255,rand()%130,rand()%80));//COLOR_BRG(255>>intensity,130>>intensity,80>>intensity));
         }
-    } else if (r->state == 1) {
+    } else if (r->state >= 1 && r->state < 200) {
         for (int i = 0; i < num_leds; i++)
             if (r->letter_leds[i]) set_fbpixel(i, r->letter_color);
-        r->state = 2;
+        r->state += 1;
     }
 }
 struct rocket_t r1 = {
@@ -414,7 +414,7 @@ void fireworks_run(bool fizzle) {
         rockets[i]->fizzle = fizzle;
     }
 
-    for (int t = 1; t <= 2000; ++t) {
+    for (int t = 1; t <= 2200; ++t) {
         if (t % 20 == 0) decay_frame_buffer();
         
         if (t % 140 == 0) {
