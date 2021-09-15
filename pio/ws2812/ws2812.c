@@ -388,8 +388,8 @@ struct rocket_t r3 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = p_2_color,
     .letter_leds = &p_2_leds,
-    .path_len = 5,
-    .path = {31,30,29,26,25},
+    .path_len = 4,
+    .path = {31,29,26,25},
     .fizzle = true
 };
 struct rocket_t r4 = {
@@ -399,8 +399,8 @@ struct rocket_t r4 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = excl_color,
     .letter_leds = &excl_leds,
-    .path_len = 5,
-    .path = {31,30,29,26,25},
+    .path_len = 4,
+    .path = {31,29,26,25},
     .fizzle = true
 };
 struct rocket_t *rockets[] = {&r1,&r2,&r3,&r4};
