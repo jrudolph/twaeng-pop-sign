@@ -508,6 +508,7 @@ int main() {
     while(1) {
         fade_up_letters();
         glowing_letters(0);
+        paint_letters_to_buffer(frame_buffer);
         fireworks();
         fade_up_letters();
         glowing_letters(0);
