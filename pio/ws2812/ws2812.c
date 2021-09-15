@@ -437,11 +437,11 @@ void fireworks() {
 
 void put_faded_pixel(uint32_t color, int fade) {
     for (int i = 0; i < 4; ++i)
-        ((uint8_t*)&color)[i] = (((uint16_t)(((uint8_t*)&color)[i])) * (32 - fade))>>5;
+        ((uint8_t*)&color)[i] = (((uint16_t)(((uint8_t*)&color)[i])) * fade)>>5;
     put_pixel(color);
 }
 void fade_up_letters() {
-    for (int t = 0; t < 8; ++t) {
+    for (int t = 0; t < 32; ++t) {
         for (int i = 0; i < num_leds; ++i) {
             if (p_1_leds[i] && o_leds[i])
                 put_faded_pixel(p_1_o_color, t);
@@ -460,7 +460,7 @@ void fade_up_letters() {
             else put_pixel(0);
         }
 
-        sleep_ms(40);
+        sleep_ms(30);
     }
 }
 
@@ -471,19 +471,19 @@ void glowing_letters() {
     for (int t = 0; t < 100; ++t) {
         for (int i = 0; i < num_leds; ++i) {
             if (p_1_leds[i] && o_leds[i])
-                put_faded_pixel(p_1_o_color, rand() % flicker);
+                put_faded_pixel(p_1_o_color, 32 - rand() % flicker);
             else if (p_1_leds[i])
-                put_faded_pixel(p_1_color, rand() % flicker);
+                put_faded_pixel(p_1_color, 32 - rand() % flicker);
             else if (o_p_2_leds[i])
-                put_faded_pixel(o_p2_color, rand() % flicker);
+                put_faded_pixel(o_p2_color, 32 - rand() % flicker);
             else if (o_leds[i])
-                put_faded_pixel(o_color, rand() % flicker);
+                put_faded_pixel(o_color, 32 - rand() % flicker);
             else if (p_2_leds[i] && excl_leds[i])
-                put_faded_pixel(p_2_excl_color, rand() % flicker);
+                put_faded_pixel(p_2_excl_color, 32 - rand() % flicker);
             else if (p_2_leds[i])
-                put_faded_pixel(p_2_color, rand() % flicker);
+                put_faded_pixel(p_2_color, 32 - rand() % flicker);
             else if (excl_leds[i])
-                put_faded_pixel(excl_color, rand() % flicker);
+                put_faded_pixel(excl_color, 32 - rand() % flicker);
             else put_pixel(0);
         }
 
