@@ -515,31 +515,34 @@ void put_faded_pixel(uint32_t color, int fade) {
         ((uint8_t*)&color)[i] = (((uint16_t)(((uint8_t*)&color)[i])) * fade)>>6;
     put_pixel(color);
 }
+
+const int flicker = 12;
+
 void fade_up_letters() {
+    int flicker_eff = 0;
     for (int t = 0; t < 64; ++t) {
+        flicker_eff = t >> 2;
         for (int i = 0; i < num_leds; ++i) {
             if (p_1_leds[i] && o_leds[i])
-                put_faded_pixel(p_1_o_color, t);
+                put_faded_pixel(p_1_o_color, t - rand() % flicker_eff);
             else if (p_1_leds[i])
-                put_faded_pixel(p_1_color, t);
+                put_faded_pixel(p_1_color, t - rand() % flicker_eff);
             else if (o_p_2_leds[i])
-                put_faded_pixel(o_p2_color, t);
+                put_faded_pixel(o_p2_color, t - rand() % flicker_eff);
             else if (o_leds[i])
-                put_faded_pixel(o_color, t);
+                put_faded_pixel(o_color, t - rand() % flicker_eff);
             else if (p_2_leds[i] && excl_leds[i])
-                put_faded_pixel(p_2_excl_color, t);
+                put_faded_pixel(p_2_excl_color, t - rand() % flicker_eff);
             else if (p_2_leds[i])
-                put_faded_pixel(p_2_color, t);
+                put_faded_pixel(p_2_color, t - rand() % flicker_eff);
             else if (excl_leds[i])
-                put_faded_pixel(excl_color, t);
+                put_faded_pixel(excl_color, t - rand() % flicker_eff);
             else put_pixel(0);
         }
 
         sleep_ms(30);
     }
 }
-
-const int flicker = 12;
 
 void glowing_letters() {
 
