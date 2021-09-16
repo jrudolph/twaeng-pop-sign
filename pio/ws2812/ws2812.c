@@ -13,6 +13,7 @@
 #include "ws2812.pio.h"
 
 #define COLOR_BRG(R, G, B) (((G) << 16) | ((R) << 8) | (B))
+#define WHITE COLOR_BRG(255,130,80)
 
 static inline void put_pixel(uint32_t pixel_grb) {
     pio_sm_put_blocking(pio0, 0, pixel_grb << 8u);
@@ -401,12 +402,58 @@ struct rocket_t r4 = {
     .letter_color = excl_color,
     .letter_leds = &excl_leds,
     .path_len = 4,
-    .path = {31,29,26,25},
+    .path = {30,29,26,25},
     .fizzle = true
 };
 struct rocket_t *rockets[] = {&r1,&r2,&r3,&r4};
 
-void fireworks_run(bool fizzle) {
+struct rocket_t r5 = {
+    .offset_ms = 0,
+    .pos_idx = 0,
+    .state = 0,
+    .color = COLOR_BRG(25, 5 , 0),
+    .letter_color = WHITE,
+    .letter_leds = &p_1_leds,
+    .path_len = 6,
+    .path = {0,1,2,3,4,5},
+    .fizzle = true
+};
+struct rocket_t r6 = {
+    .offset_ms = 0,
+    .pos_idx = 0,
+    .state = 0,
+    .color = COLOR_BRG(25, 5 , 0),
+    .letter_color = WHITE,
+    .letter_leds = &o_leds,
+    .path_len = 6,
+    .path = {19,20,21,16,15,14},
+    .fizzle = true
+};
+struct rocket_t r7 = {
+    .offset_ms = 420,
+    .pos_idx = 0,
+    .state = 0,
+    .color = COLOR_BRG(25, 5 , 0),
+    .letter_color = WHITE,
+    .letter_leds = &p_2_leds,
+    .path_len = 4,
+    .path = {31,29,26,25},
+    .fizzle = true
+};
+struct rocket_t r8 = {
+    .offset_ms = 420,
+    .pos_idx = 0,
+    .state = 0,
+    .color = COLOR_BRG(25, 5 , 0),
+    .letter_color = WHITE,
+    .letter_leds = &excl_leds,
+    .path_len = 4,
+    .path = {30,29,26,25},
+    .fizzle = true
+};
+struct rocket_t *white_rockets[] = {&r5,&r6,&r7,&r8};
+
+void fireworks_run(bool fizzle, struct rocket_t **rockets) {
     // reset rockets
     for (int i = 0; i < 4; i++) {
         rockets[i]->state = 0;
@@ -431,9 +478,11 @@ void fireworks_run(bool fizzle) {
     }
 }
 void fireworks() {
-    fireworks_run(false);
-    fireworks_run(true);
-    fireworks_run(false);
+    fireworks_run(false, rockets);
+    fireworks_run(true, rockets);
+    fireworks_run(false, rockets);
+    fireworks_run(false, white_rockets);
+    fireworks_run(false, rockets);
 }
 
 void put_faded_pixel(uint32_t color, int fade) {
