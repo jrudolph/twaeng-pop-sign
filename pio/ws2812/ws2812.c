@@ -75,18 +75,18 @@ const struct {
 };
 
 const int PIN_TX = 28;
+#define num_leds 37
 
 const int p_len = 12; // first p has 12 leds
 const int o_len = 7;  // o has 7 leds
 const int p_2_len = 9;
 const int o_off = p_len;
 const int po_mix_idx = 9; // led 9 is part of o
-const int num_leds = 32;
-const int p_1_leds[] = {0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int o_leds[] =   {0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int o_p_2_leds[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // only want that middle one
-const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,0,1,1,1,1,0,0,0};
-const int excl_leds[]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,1,1,1};
+const int p_1_leds[] = {1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int o_leds[] =   {0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int o_p_2_leds[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // only want that middle one
+const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0};
+const int excl_leds[]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
 
 const uint32_t p_1_color = COLOR_BRG(240, 5, 2);
 const uint32_t p_1_o_color = COLOR_BRG(20, 0, 40);
@@ -129,9 +129,43 @@ void show_all(uint t) {
 #define NO_NEIGHBORS 255
 // contains an index into adjacency_nodes per node (or 255 for no neighbors besides +/- 1)
 uint8_t adjacency_refs[] = {
-    NO_NEIGHBORS, 75, NO_NEIGHBORS, 0, NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, // - 7
-    4, 8, 13, 17, 20, NO_NEIGHBORS, 24, 28, 32, NO_NEIGHBORS, 37, NO_NEIGHBORS, 41, 43, 47, 51, // - 23
-    NO_NEIGHBORS, 55, 59, 63, 67, 71, NO_NEIGHBORS, NO_NEIGHBORS
+    NO_NEIGHBORS, // 0
+    NO_NEIGHBORS, // 1
+    NO_NEIGHBORS, // 2
+    0,            // 3
+    NO_NEIGHBORS, // 4
+    NO_NEIGHBORS, // 5
+    NO_NEIGHBORS, // 6
+    NO_NEIGHBORS, // 7
+    4,            // 8
+    8,            // 9
+    13,           // 10
+    17,           // 11
+    20,           // 12
+    NO_NEIGHBORS, // 13
+    24,           // 14
+    28,           // 15
+    32,           // 16
+    NO_NEIGHBORS, // 17
+    NO_NEIGHBORS, // 18
+    37,           // 19
+    41,           // 20
+    NO_NEIGHBORS, // 21
+    43,           // 22
+    47,           // 23
+    NO_NEIGHBORS, // 24
+    NO_NEIGHBORS, // 25
+    51,           // 26
+    NO_NEIGHBORS, // 27
+    56,           // 28
+    60,           // 29
+    62,           // 30
+    66,           // 31
+    NO_NEIGHBORS, // 32
+    NO_NEIGHBORS, // 33
+    NO_NEIGHBORS, // 34
+    NO_NEIGHBORS, // 35
+    NO_NEIGHBORS, // 36
 };
 // contains adjacent node entries
 // i + 0 = number of entries
@@ -140,24 +174,22 @@ uint8_t adjacency_nodes[] =
     {
         3, 2, 11, 4,       // for 3
         3, 7, 9, 12,       // for 8
-        4, 8, 10, 12, 18,  // for 9
-        3, 9, 11, 18,      // for 10
+        3, 8, 10, 19, 255, // for 9
+        3, 9, 11, 19,      // for 10
         2, 3, 10,          // for 11
-        3, 8, 9, 13,       // for 12
-        3, 13, 15, 22,     // for 14
-        3, 14, 16, 22,     // for 15
-        4, 15, 17, 21, 28, // for 16
-        3, 9, 10, 17,      // for 18
+        2, 8, 13, 255,     // for 12
+        3, 13, 15, 23,     // for 14
+        3, 14, 16, 23,     // for 15
+        3, 15, 17, 28, 255,// for 16
+        3, 9, 10, 18,      // for 19
         1, 21,             // for 20
-        3, 16, 20, 28,     // for 21
-        3, 14, 15, 22,     // for 22
-        3, 22, 24, 25,     // for 23
-        3, 23, 24, 26,     // for 25
-        3, 25, 27, 29,     // for 26
-        3, 26, 28, 29,     // for 27
-        3, 16, 21, 27,     // for 28
-        3, 26, 27, 30,     // for 29
-        1, 2,              // for 1 - 0 is disabled for now
+        3, 17, 21, 28,     // for 22
+        3, 14, 15, 24,     // for 23
+        4, 25, 27, 30, 31, // for 26
+        3, 16, 22, 27,     // for 28
+        1, 30,             // for 29
+        3, 26, 29, 31,     // for 30
+        3, 26, 30, 32,     // for 31
     };
 
 uint8_t random_next_pos(uint8_t at, uint8_t exclude, uint8_t exclude2) {
@@ -225,13 +257,13 @@ uint32_t worm_color_by_speed(int speed, uint32_t t, int idx) {
 }
 
 uint8_t worm0 = 6;
-uint8_t worm1 = 32;
-uint8_t worm2 = 32;
-uint8_t worm3 = 32;
+uint8_t worm1 = num_leds;
+uint8_t worm2 = num_leds;
+uint8_t worm3 = num_leds;
 
-uint32_t frame_buffer[32];
+uint32_t frame_buffer[num_leds];
 
-uint32_t background[32];
+uint32_t background[num_leds];
 
 void paint_letters_to_buffer(uint32_t *buffer) {
     for (int i = 0; i < num_leds; ++i) {
@@ -260,7 +292,7 @@ void init_background() {
         ((uint8_t*)background)[i] = max(1, (((uint16_t)(((uint8_t*)background)[i])))>>3);
     }
 }
-uint32_t paint_buffer[32];
+uint32_t paint_buffer[num_leds];
 void paint_mixed() {
     for (int i = 0; i < num_leds * 4; ++i) {
         ((uint8_t*)paint_buffer)[i] =
@@ -380,18 +412,18 @@ struct rocket_t r2 = {
     .letter_color = o_color,
     .letter_leds = &o_leds,
     .path_len = 6,
-    .path = {19,20,21,16,15,14},
+    .path = {20,21,22,16,15,14},
     .fizzle = true
 };
 struct rocket_t r3 = {
-    .offset_ms = 700,
+    .offset_ms = 560,
     .pos_idx = 0,
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = p_2_color,
     .letter_leds = &p_2_leds,
-    .path_len = 4,
-    .path = {31,29,26,25},
+    .path_len = 5,
+    .path = {34,33,32,26,25},
     .fizzle = true
 };
 struct rocket_t r4 = {
@@ -402,7 +434,7 @@ struct rocket_t r4 = {
     .letter_color = excl_color,
     .letter_leds = &excl_leds,
     .path_len = 4,
-    .path = {30,29,26,25},
+    .path = {34,33,32,31},
     .fizzle = true
 };
 struct rocket_t *rockets[] = {&r1,&r2,&r3,&r4};
@@ -426,18 +458,18 @@ struct rocket_t r6 = {
     .letter_color = WHITE,
     .letter_leds = &o_leds,
     .path_len = 6,
-    .path = {19,20,21,16,15,14},
+    .path = {20,21,22,16,15,14},
     .fizzle = true
 };
 struct rocket_t r7 = {
-    .offset_ms = 420,
+    .offset_ms = 210,
     .pos_idx = 0,
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = WHITE,
     .letter_leds = &p_2_leds,
-    .path_len = 4,
-    .path = {31,29,26,25},
+    .path_len = 5,
+    .path = {34,33,32,26,25},
     .fizzle = true
 };
 struct rocket_t r8 = {
@@ -445,10 +477,10 @@ struct rocket_t r8 = {
     .pos_idx = 0,
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
-    .letter_color = WHITE,
+    .letter_color = excl_color,
     .letter_leds = &excl_leds,
     .path_len = 4,
-    .path = {30,29,26,25},
+    .path = {34,33,32,31},
     .fizzle = true
 };
 struct rocket_t *white_rockets[] = {&r5,&r6,&r7,&r8};
