@@ -588,12 +588,12 @@ int main() {
     init_background();
 
     while(1) {
-        fade_up_letters();
-        glowing_letters(0);
-        paint_letters_to_buffer(frame_buffer);
-        fireworks();
-        fade_up_letters();
-        glowing_letters(0);
+        // fade_up_letters();
+        // glowing_letters(0);
+        // paint_letters_to_buffer(frame_buffer);
+        // fireworks();
+        // fade_up_letters();
+        // glowing_letters(0);
 
         speed = 60;
         paint_letters_to_buffer(frame_buffer); // for a smooth fading to background
