@@ -128,8 +128,8 @@ void show_all(uint t) {
 #define NO_NEIGHBORS 255
 // contains an index into adjacency_nodes per node (or 255 for no neighbors besides +/- 1)
 uint8_t adjacency_refs[] = {
-    NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, 0, NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, // - 7
-    4, 8, 13, 17, 20, NO_NEIGHBORS, 24, 28, 32, NO_NEIGHBORS, 37, 41, NO_NEIGHBORS, 43, 47, 51, // - 23
+    NO_NEIGHBORS, 75, NO_NEIGHBORS, 0, NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, NO_NEIGHBORS, // - 7
+    4, 8, 13, 17, 20, NO_NEIGHBORS, 24, 28, 32, NO_NEIGHBORS, 37, NO_NEIGHBORS, 41, 43, 47, 51, // - 23
     NO_NEIGHBORS, 55, 59, 63, 67, 71, NO_NEIGHBORS, NO_NEIGHBORS
 };
 // contains adjacent node entries
@@ -147,7 +147,7 @@ uint8_t adjacency_nodes[] =
         3, 14, 16, 22,     // for 15
         4, 15, 17, 21, 28, // for 16
         3, 9, 10, 17,      // for 18
-        1, 20,             // for 19
+        1, 21,             // for 20
         3, 16, 20, 28,     // for 21
         3, 14, 15, 22,     // for 22
         3, 22, 24, 25,     // for 23
@@ -156,6 +156,7 @@ uint8_t adjacency_nodes[] =
         3, 26, 28, 29,     // for 27
         3, 16, 21, 27,     // for 28
         3, 26, 27, 30,     // for 29
+        1, 2,              // for 1 - 0 is disabled for now
     };
 
 uint8_t random_next_pos(uint8_t at, uint8_t exclude, uint8_t exclude2) {
