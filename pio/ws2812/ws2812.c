@@ -246,14 +246,14 @@ uint32_t worm_color_by_speed(int speed, uint32_t t, int idx) {
             else return COLOR_BRG(40, 20, 200);
         else if (t < 4000)
             if (idx)
-                return COLOR_BRG(interp(3500,4000, 200, 50, t), interp(3500, 4000, 130, 0, t), interp(3500, 4000, 80, 0, t));
+                return COLOR_BRG(interp(3500,4000, 40, 255, t), interp(3500,4000,20,0,t), interp(3500,4000,200,255,t));
             else
-                return COLOR_BRG(interp(3500,4000, 40, 255, t),interp(3500,4000,200,0,t),interp(3500,4000,200,0,t));
+                return COLOR_BRG(interp(3500,4000, 255, 0, t), interp(3500, 4000, 130, 255, t), interp(3500, 4000, 80, 0, t));
         else
             if (idx)
-                return COLOR_BRG(interp(4000,4800, 50, 10, t), 0,0);
+                return COLOR_BRG(255, 0, 255);
             else
-                return COLOR_BRG(interp(4000,4800, 255, 20, t),0,0);
+                return COLOR_BRG(0, 255, 0);
 }
 
 uint8_t worm0 = 6;
@@ -336,19 +336,12 @@ void worm_moves(uint32_t t) {
     paint_mixed();
 }
 
-void story() {
-    // worm finds the light
-    // worm moves around randomly
-    // worm gets to spin (faster and faster)
-    // worm overheats
-    // worm heartbeats
-    // worm grows a sparkling longer tail
-    // worm paints letters
-    // fireworks
-    // p - o - p - !
-    // pop! pulsating
-    // pop! static
-    // (smiley)
+void worm() {
+    speed = 60;
+    for (uint32_t i = 0; i < 4800; ++i) {
+        worm_moves(i);
+        sleep_ms(5);
+    }
 }
 
 struct rocket_t {
@@ -585,51 +578,23 @@ int main() {
 
     ws2812_program_init(pio, sm, offset, PIN_TX, 800000, false);
 
-    init_background();
-
     while(1) {
-        // fade_up_letters();
-        // glowing_letters(0);
-        // paint_letters_to_buffer(frame_buffer);
-        // fireworks();
-        // fade_up_letters();
-        // glowing_letters(0);
+        fade_up_letters();
+        glowing_letters(0);
+        paint_letters_to_buffer(frame_buffer);
+        fireworks();
+        fade_up_letters();
+        glowing_letters(0);
 
-        speed = 60;
         paint_letters_to_buffer(frame_buffer); // for a smooth fading to background
-        for (uint32_t i = 0; i < 4800; ++i) {
-                worm_moves(i);
-                sleep_ms(5);
+        init_background();
+        worm();
+        for (int t = 0; t < 800; t++) {
+            if (t % 20 == 0) decay_frame_buffer();
+            paint_frame_buffer();
+            sleep_ms(1);
         }
     }
-
-    // while (1) {
-    //     speed = 60;
-    //     for (uint32_t i = 0; i < 5000; ++i) {
-    //          worm_moves(i);
-    //          sleep_ms(5);
-    //     }
-    //     fireworks();
-    // }
-        
-    //     /* for (int i = 0; i < 100; ++i) {
-    //         show_letter(p_1_leds, p_1_color, i);
-    //         sleep_ms(10);
-    //     }
-    //     for (int i = 0; i < 100; ++i) {
-    //         show_letter(o_leds, o_color, i);
-    //         sleep_ms(10);
-    //     }
-    //     for (int i = 0; i < 100; ++i) {
-    //         show_letter(p_2_leds, p_2_color, i);
-    //         sleep_ms(10);
-    //     }
-    //     for (int i = 0; i < 100; ++i) {
-    //         show_letter(excl_leds, excl_color, i);
-    //         sleep_ms(10);
-    //     }*/
-    //     fade_up_letters();
-    //     sleep_ms(60000);
         
     //     // int pat = rand() % count_of(pattern_table);
     //     // int dir = (rand() >> 30) & 1 ? 1 : -1;
