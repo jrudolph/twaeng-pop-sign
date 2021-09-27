@@ -75,18 +75,18 @@ const struct {
 };
 
 const int PIN_TX = 28;
-#define num_leds 37
+#define num_leds 38
 
 const int p_len = 12; // first p has 12 leds
 const int o_len = 7;  // o has 7 leds
 const int p_2_len = 9;
 const int o_off = p_len;
 const int po_mix_idx = 9; // led 9 is part of o
-const int p_1_leds[] = {1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int o_leds[] =   {0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int o_p_2_leds[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // only want that middle one
-const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0};
-const int excl_leds[]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
+const int p_1_leds[] = {1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int o_leds[] =   {0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int o_p_2_leds[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // only want that middle one
+const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0};
+const int excl_leds[]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1};
 
 const uint32_t p_1_color = COLOR_BRG(240, 5, 2);
 const uint32_t p_1_o_color = COLOR_BRG(20, 0, 40);
@@ -166,6 +166,7 @@ uint8_t adjacency_refs[] = {
     NO_NEIGHBORS, // 34
     NO_NEIGHBORS, // 35
     NO_NEIGHBORS, // 36
+    NO_NEIGHBORS, // 37
 };
 // contains adjacent node entries
 // i + 0 = number of entries
@@ -190,6 +191,7 @@ uint8_t adjacency_nodes[] =
         1, 30,             // for 29
         3, 26, 29, 31,     // for 30
         3, 26, 30, 32,     // for 31
+        // FIXME connect 34 and 37
     };
 
 uint8_t random_next_pos(uint8_t at, uint8_t exclude, uint8_t exclude2) {
@@ -420,14 +422,14 @@ struct rocket_t r3 = {
     .fizzle = true
 };
 struct rocket_t r4 = {
-    .offset_ms = 840,
+    .offset_ms = 700,
     .pos_idx = 0,
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = excl_color,
     .letter_leds = &excl_leds,
-    .path_len = 4,
-    .path = {34,33,32,31},
+    .path_len = 5,
+    .path = {36,34,33,32,31},
     .fizzle = true
 };
 struct rocket_t *rockets[] = {&r1,&r2,&r3,&r4};
@@ -521,7 +523,7 @@ const int flicker = 12;
 void fade_up_letters() {
     int flicker_eff = 0;
     for (int t = 0; t < 64; ++t) {
-        flicker_eff = t >> 2;
+        flicker_eff = t >> 3;
         for (int i = 0; i < num_leds; ++i) {
             if (p_1_leds[i] && o_leds[i])
                 put_faded_pixel(p_1_o_color, t - rand() % flicker_eff);
