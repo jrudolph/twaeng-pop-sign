@@ -206,6 +206,9 @@ uint32_t frame_buffer[num_leds];
 
 uint32_t background[num_leds];
 
+const int default_pwm_led_fade = 180;
+int pwm_led_fade = default_pwm_led_fade;
+
 void paint_letters_to_buffer(uint32_t *buffer) {
     for (int i = 0; i < num_leds; ++i) {
         if (p_1_leds[i] && o_leds[i])
@@ -249,6 +252,7 @@ void decay_frame_buffer() {
     for (int i = 0; i < num_leds * 4; ++i) {
         ((uint8_t*)frame_buffer)[i] = (((uint16_t)(((uint8_t*)frame_buffer)[i])) * 14)>>4; // 14/16
     }
+    pwm_led_fade = (pwm_led_fade * 14) >> 4;
 }
 void set_fbpixel(uint8_t pixel, uint32_t color) {
     if (pixel < num_leds) frame_buffer[pixel] = color;
@@ -318,10 +322,12 @@ void rocket_paint(struct rocket_t *r, int t) {
     if (r->state == 0) 
         set_fbpixel(r->path[r->pos_idx], r->color);
     else if (r->fizzle) {
+        pwm_led_fade = 200;
         for (int i = 0; i < 2; i++) {
             set_fbpixel(r->fizzle_leds[i], COLOR_BRG(rand()%255,rand()%130,rand()%80));//COLOR_BRG(255>>intensity,130>>intensity,80>>intensity));
         }
     } else if (r->state >= 1 && r->state < 200) {
+        pwm_led_fade = 200;
         for (int i = 0; i < num_leds; i++)
             if (r->letter_leds[i]) set_fbpixel(i, r->letter_color);
         r->state += 1;
@@ -480,6 +486,7 @@ void fade_up_letters() {
                 put_faded_pixel(excl_color, t - rand() % flicker_eff);
             else put_pixel(0);
         }
+        pwm_led_fade = (default_pwm_led_fade * t) >> 6;
 
         sleep_ms(30);
     }
@@ -511,8 +518,6 @@ void glowing_letters() {
 }
 
 #define LED_PWM_PIN 22
-
-int pwm_led_fade = 100;
 
 void on_pwm_wrap() {
     // Clear the interrupt flag that brought us here
@@ -548,7 +553,7 @@ void init_pwm() {
 int main() {
     //set_sys_clock_48();
     stdio_init_all();
-    puts("WS2812 Smoke Test");
+    puts("Twaeng Pop Sign");
 
     init_pwm();
 
