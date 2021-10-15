@@ -77,68 +77,58 @@ void show_all(uint t) {
 // contains an index into adjacency_nodes per node (or 255 for no neighbors besides +/- 1)
 uint8_t adjacency_refs[] = {
     NO_NEIGHBORS, // 0
-    NO_NEIGHBORS, // 1
-    NO_NEIGHBORS, // 2
-    0,            // 3
-    NO_NEIGHBORS, // 4
-    NO_NEIGHBORS, // 5
-    NO_NEIGHBORS, // 6
-    NO_NEIGHBORS, // 7
-    4,            // 8
-    8,            // 9
-    13,           // 10
-    17,           // 11
-    20,           // 12
-    NO_NEIGHBORS, // 13
-    24,           // 14
-    28,           // 15
-    32,           // 16
-    NO_NEIGHBORS, // 17
-    NO_NEIGHBORS, // 18
-    37,           // 19
-    41,           // 20
-    NO_NEIGHBORS, // 21
-    43,           // 22
-    47,           // 23
+    0, // 1
+    4, // 2
+    NO_NEIGHBORS,            // 3
+    8, // 4
+    11, // 5
+    15, // 6
+    19, // 7
+    23,            // 8
+    27,            // 9
+    31,           // 10
+    34,           // 11
+    38,           // 12
+    42, // 13
+    46,           // 14
+    52,           // 15
+    57,           // 16
+    59, // 17
+    63, // 18
+    66,           // 19
+    71,           // 20
+    76, // 21
+    79,           // 22
+    84,           // 23
     NO_NEIGHBORS, // 24
-    NO_NEIGHBORS, // 25
-    51,           // 26
-    NO_NEIGHBORS, // 27
-    56,           // 28
-    60,           // 29
-    62,           // 30
-    66,           // 31
-    NO_NEIGHBORS, // 32
-    NO_NEIGHBORS, // 33
-    NO_NEIGHBORS, // 34
-    NO_NEIGHBORS, // 35
-    NO_NEIGHBORS, // 36
-    NO_NEIGHBORS, // 37
 };
 // contains adjacent node entries
 // i + 0 = number of entries
 // i + 1..n = adjacent nodes
 uint8_t adjacency_nodes[] =
     {
-        3, 2, 11, 4,       // for 3
-        3, 7, 9, 12,       // for 8
-        3, 8, 10, 19, 255, // for 9
-        3, 9, 11, 19,      // for 10
-        2, 3, 10,          // for 11
-        2, 8, 13, 255,     // for 12
-        3, 13, 15, 23,     // for 14
-        3, 14, 16, 23,     // for 15
-        3, 15, 17, 28, 255,// for 16
-        3, 9, 10, 18,      // for 19
-        1, 21,             // for 20
-        3, 17, 21, 28,     // for 22
-        3, 14, 15, 24,     // for 23
-        4, 25, 27, 30, 31, // for 26
-        3, 16, 22, 27,     // for 28
-        1, 30,             // for 29
-        3, 26, 29, 31,     // for 30
-        3, 26, 30, 32,     // for 31
-        // FIXME connect 34 and 37
+        3,0,2,5,  // 1 - 0
+        3,1,3,5,  // 2 - 4
+        2,3,7,    // 4 - 8
+        3,1,2,6,  // 5 - 11
+        3,5,7,9,  // 6 - 15
+        3,4,6,8,  // 7 - 19
+        3,7,9,10, // 8 - 23
+        3,6,8,11, // 9 - 27
+        2,8,12,   //10 - 31
+        3,9,12,15,// 11 - 34
+        3,10,11,13, // 12 - 38
+        3,12,14,18, // 13 - 42
+        5,11,12,13,15,17, // 14 - 46
+        4,11,14,16,17, //15 - 52
+        1,15, // 16 - 57
+        3,14,15,20, // 17 - 59
+        2,13,19, // 18 - 63
+        4,18,20,21,22, // 19 - 66
+        4,17,19,22,23, // 20 - 71
+        2,19,22, // 21 - 76
+        4,19,20,21,23, // 22 - 79
+        3,20,22,24, // 23 - 84
     };
 
 uint8_t random_next_pos(uint8_t at, uint8_t exclude, uint8_t exclude2) {
