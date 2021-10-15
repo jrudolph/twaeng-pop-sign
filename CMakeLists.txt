@@ -13,5 +13,5 @@ pico_generate_pio_header(twaeng_pop_sign ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio OU
 
 target_sources(twaeng_pop_sign PRIVATE twaeng_pop.c)
 
-target_link_libraries(twaeng_pop_sign PRIVATE pico_stdlib hardware_pio)
+target_link_libraries(twaeng_pop_sign PRIVATE pico_stdlib hardware_pio hardware_pwm)
 pico_add_extra_outputs(twaeng_pop_sign)
