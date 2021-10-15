@@ -27,18 +27,13 @@ static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 const int PIN_TX = 28;
-#define num_leds 38
+#define num_leds 25
 
-const int p_len = 12; // first p has 12 leds
-const int o_len = 7;  // o has 7 leds
-const int p_2_len = 9;
-const int o_off = p_len;
-const int po_mix_idx = 9; // led 9 is part of o
-const int p_1_leds[] = {1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int o_leds[] =   {0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int o_p_2_leds[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // only want that middle one
-const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0};
-const int excl_leds[]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1};
+const int p_1_leds[] = {1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int o_leds[] =   {0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int o_p_2_leds[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // only want that middle one
+const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int excl_leds[]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 const uint32_t p_1_color = COLOR_BRG(240, 5, 2);
 const uint32_t p_1_o_color = COLOR_BRG(20, 0, 40);
@@ -347,8 +342,8 @@ struct rocket_t r1 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = p_1_color,
     .letter_leds = &p_1_leds,
-    .path_len = 6,
-    .path = {0,1,2,3,4,5},
+    .path_len = 5,
+    .path = {0,1,2,3,4},
     .fizzle = true
 };
 struct rocket_t r2 = {
@@ -358,8 +353,8 @@ struct rocket_t r2 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = o_color,
     .letter_leds = &o_leds,
-    .path_len = 6,
-    .path = {20,21,22,16,15,14},
+    .path_len = 5,
+    .path = {16,15,14,13,18},
     .fizzle = true
 };
 struct rocket_t r3 = {
@@ -369,8 +364,8 @@ struct rocket_t r3 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = p_2_color,
     .letter_leds = &p_2_leds,
-    .path_len = 5,
-    .path = {34,33,32,26,25},
+    .path_len = 4,
+    .path = {24,23,22,21},
     .fizzle = true
 };
 struct rocket_t r4 = {
@@ -380,8 +375,8 @@ struct rocket_t r4 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = excl_color,
     .letter_leds = &excl_leds,
-    .path_len = 5,
-    .path = {36,34,33,32,31},
+    .path_len = 4,
+    .path = {24,23,22,21},
     .fizzle = true
 };
 struct rocket_t *rockets[] = {&r1,&r2,&r3,&r4};
@@ -393,8 +388,8 @@ struct rocket_t r5 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = WHITE,
     .letter_leds = &p_1_leds,
-    .path_len = 6,
-    .path = {0,1,2,3,4,5},
+    .path_len = 5,
+    .path = {0,1,2,3,4},
     .fizzle = true
 };
 struct rocket_t r6 = {
@@ -404,8 +399,8 @@ struct rocket_t r6 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = WHITE,
     .letter_leds = &o_leds,
-    .path_len = 6,
-    .path = {20,21,22,16,15,14},
+    .path_len = 5,
+    .path = {16,15,14,13,18},
     .fizzle = true
 };
 struct rocket_t r7 = {
@@ -415,8 +410,8 @@ struct rocket_t r7 = {
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = WHITE,
     .letter_leds = &p_2_leds,
-    .path_len = 5,
-    .path = {34,33,32,26,25},
+    .path_len = 4,
+    .path = {24,23,22,21},
     .fizzle = true
 };
 struct rocket_t r8 = {
@@ -427,7 +422,7 @@ struct rocket_t r8 = {
     .letter_color = excl_color,
     .letter_leds = &excl_leds,
     .path_len = 4,
-    .path = {34,33,32,31},
+    .path = {24,23,22,21},
     .fizzle = true
 };
 struct rocket_t *white_rockets[] = {&r5,&r6,&r7,&r8};
