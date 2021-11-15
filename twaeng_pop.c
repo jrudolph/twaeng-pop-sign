@@ -206,7 +206,8 @@ uint32_t frame_buffer[num_leds];
 
 uint32_t background[num_leds];
 
-const int default_pwm_led_fade = 180;
+const int default_pwm_led_fade = 80;
+const int highlight_pwm_led_fade = 150;
 int pwm_led_fade = default_pwm_led_fade;
 
 void paint_letters_to_buffer(uint32_t *buffer) {
@@ -322,12 +323,12 @@ void rocket_paint(struct rocket_t *r, int t) {
     if (r->state == 0) 
         set_fbpixel(r->path[r->pos_idx], r->color);
     else if (r->fizzle) {
-        pwm_led_fade = 200;
+        pwm_led_fade = highlight_pwm_led_fade;
         for (int i = 0; i < 2; i++) {
             set_fbpixel(r->fizzle_leds[i], COLOR_BRG(rand()%255,rand()%130,rand()%80));//COLOR_BRG(255>>intensity,130>>intensity,80>>intensity));
         }
     } else if (r->state >= 1 && r->state < 200) {
-        pwm_led_fade = 200;
+        pwm_led_fade = highlight_pwm_led_fade;
         for (int i = 0; i < num_leds; i++)
             if (r->letter_leds[i]) set_fbpixel(i, r->letter_color);
         r->state += 1;
