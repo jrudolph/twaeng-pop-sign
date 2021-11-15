@@ -1,7 +1,5 @@
 /**
- * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
- *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2021 Johannes Rudolph
  */
 
 #include <stdio.h>
@@ -31,11 +29,11 @@ static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
 const int PIN_TX = 28;
 #define num_leds 25
 
-const int p_1_leds[] = {1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int o_leds[] =   {0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int o_p_2_leds[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // only want that middle one
-const int p_2_leds[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-const int excl_leds[]= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int p_1_leds[num_leds]   = {1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int o_leds[num_leds]     = {0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0};
+const int o_p_2_leds[num_leds] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+const int p_2_leds[num_leds]   = {0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0};
+const int excl_leds[num_leds]  = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1};
 
 const uint32_t p_1_color = COLOR_BRG(240, 5, 2);
 const uint32_t p_1_o_color = COLOR_BRG(20, 0, 40);
@@ -77,7 +75,7 @@ void show_all(uint t) {
 // topology of led sign, defines which nodes are physically adjacent
 #define NO_NEIGHBORS 255
 // contains an index into adjacency_nodes per node (or 255 for no neighbors besides +/- 1)
-uint8_t adjacency_refs[] = {
+uint8_t adjacency_refs[num_leds] = {
     NO_NEIGHBORS, // 0
     0, // 1
     4, // 2
@@ -325,7 +323,7 @@ void rocket_paint(struct rocket_t *r, int t) {
     else if (r->fizzle) {
         pwm_led_fade = highlight_pwm_led_fade;
         for (int i = 0; i < 2; i++) {
-            set_fbpixel(r->fizzle_leds[i], COLOR_BRG(rand()%255,rand()%130,rand()%80));//COLOR_BRG(255>>intensity,130>>intensity,80>>intensity));
+            set_fbpixel(r->fizzle_leds[i], COLOR_BRG(rand()%255,rand()%130,rand()%80));
         }
     } else if (r->state >= 1 && r->state < 200) {
         pwm_led_fade = highlight_pwm_led_fade;
@@ -340,7 +338,7 @@ struct rocket_t r1 = {
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = p_1_color,
-    .letter_leds = &p_1_leds,
+    .letter_leds = p_1_leds,
     .path_len = 5,
     .path = {0,1,2,3,4},
     .fizzle = true
@@ -351,7 +349,7 @@ struct rocket_t r2 = {
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = o_color,
-    .letter_leds = &o_leds,
+    .letter_leds = o_leds,
     .path_len = 5,
     .path = {16,15,14,13,18},
     .fizzle = true
@@ -362,7 +360,7 @@ struct rocket_t r3 = {
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = p_2_color,
-    .letter_leds = &p_2_leds,
+    .letter_leds = p_2_leds,
     .path_len = 4,
     .path = {24,23,22,21},
     .fizzle = true
@@ -373,7 +371,7 @@ struct rocket_t r4 = {
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = excl_color,
-    .letter_leds = &excl_leds,
+    .letter_leds = excl_leds,
     .path_len = 4,
     .path = {24,23,22,21},
     .fizzle = true
@@ -386,7 +384,7 @@ struct rocket_t r5 = {
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = WHITE,
-    .letter_leds = &p_1_leds,
+    .letter_leds = p_1_leds,
     .path_len = 5,
     .path = {0,1,2,3,4},
     .fizzle = true
@@ -397,7 +395,7 @@ struct rocket_t r6 = {
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = WHITE,
-    .letter_leds = &o_leds,
+    .letter_leds = o_leds,
     .path_len = 5,
     .path = {16,15,14,13,18},
     .fizzle = true
@@ -408,7 +406,7 @@ struct rocket_t r7 = {
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = WHITE,
-    .letter_leds = &p_2_leds,
+    .letter_leds = p_2_leds,
     .path_len = 4,
     .path = {24,23,22,21},
     .fizzle = true
@@ -419,7 +417,7 @@ struct rocket_t r8 = {
     .state = 0,
     .color = COLOR_BRG(25, 5 , 0),
     .letter_color = excl_color,
-    .letter_leds = &excl_leds,
+    .letter_leds = excl_leds,
     .path_len = 4,
     .path = {24,23,22,21},
     .fizzle = true
