@@ -4,12 +4,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 #include "hardware/irq.h"
 #include "hardware/pwm.h"
+#include "fast_hsv2rgb.h"
 #include "ws2812.pio.h"
 
 #define COLOR_BRG(R, G, B) (((G) << 16) | ((R) << 8) | (B))
@@ -42,6 +44,38 @@ const uint32_t o_p2_color = COLOR_BRG(28, 70, 6);
 const uint32_t p_2_color = COLOR_BRG(200, 40, 0); ///* 23, 167, 254 */));// 20,135,206
 const uint32_t p_2_excl_color = COLOR_BRG(150, 8, 1);
 const uint32_t excl_color = COLOR_BRG(150, 12, 8);
+
+// positions of pixels in mm/10 as exported from kicad
+// p_x(i) = pixel_pos[i * 2]
+// p_y(i) = pixel_pos[i * 2 + 1]
+// middle (approx): x = 623 | y = 923
+const int pixel_pos[] = {
+    448, -1031,
+    448, -967,
+    448, -904,
+    448, -840,
+    499, -815,
+    495, -927,
+    549, -904,
+    549, -839,
+    600, -853,
+    626, -916,
+    651, -815,
+    689, -916,
+    702, -853,
+    753, -840,
+    753, -904,
+    753, -967,
+    753, -1031,
+    803, -929,
+    803, -815,
+    854, -853,
+    854, -904,
+    918, -802,
+    918, -866,
+    918, -929,
+    918, -1031,
+};
 
 void show_letter(const int *letter, uint32_t color, uint t) {
     for (int i = 0; i < num_leds; ++i) {
@@ -247,11 +281,14 @@ void paint_mixed() {
 void paint_frame_buffer() {
     for (int i = 0; i < num_leds; ++i) put_pixel(frame_buffer[i]);
 }
-void decay_frame_buffer() {
+void decay_frame_buffer_by(int factor, int shift) {
     for (int i = 0; i < num_leds * 4; ++i) {
-        ((uint8_t*)frame_buffer)[i] = (((uint16_t)(((uint8_t*)frame_buffer)[i])) * 14)>>4; // 14/16
+        ((uint8_t*)frame_buffer)[i] = (((uint16_t)(((uint8_t*)frame_buffer)[i])) * factor) >> shift; // 14/16
     }
-    pwm_led_fade = (pwm_led_fade * 14) >> 4;
+    pwm_led_fade = (pwm_led_fade * factor) >> shift;
+}
+void decay_frame_buffer() {
+    decay_frame_buffer_by(14, 4);
 }
 void set_fbpixel(uint8_t pixel, uint32_t color) {
     if (pixel < num_leds) frame_buffer[pixel] = color;
@@ -492,7 +529,6 @@ void fade_up_letters() {
 }
 
 void glowing_letters() {
-
     for (int t = 0; t < 200; ++t) {
         for (int i = 0; i < num_leds; ++i) {
             if (p_1_leds[i] && o_leds[i])
@@ -513,6 +549,48 @@ void glowing_letters() {
         }
 
         sleep_ms(100);
+    }
+}
+
+const float twopi = 2. * 3.1415;
+const float wavelength = 1767;
+// x span 448, 918
+// y span -1031, -815
+const int center_x = 623;
+const int center_y = -923;
+
+void waves() {
+    int duration = 1000;
+    for (int t = 0; t < duration; ++t) {
+        pwm_led_fade = (int) (50. + 25. * sin(twopi * ((float) t )/ 223));
+        int origin_x = 448 + 470 * (sin(twopi * ((float) t / 579)) + 1) / 2;
+        int origin_y = -870 + 50 * sin(twopi * ((float) t / 459));
+        for (int i = 0; i < num_leds; ++i) {
+            int x = pixel_pos[i * 2];
+            int y = pixel_pos[i * 2 + 1];
+            float dist = sqrt((x - origin_x) * (x - origin_x) + (y - origin_y) * (y - origin_y));
+            float wave = sin(twopi * ((float)t / 351 +
+                     dist / wavelength
+                ));
+
+            uint8_t r,g,b;
+            fast_hsv2rgb_32bit(((uint16_t)(wave * 765 + 765)), 200, 40, &r, &g, &b);
+            //fast_hsv2rgb_32bit(((i + t >> 2) * 600 / num_leds + t) % 1530, 255, 50, &r, &g, &b);
+            int color = COLOR_BRG(r, g * 130 / 255, b * 80 / 255);
+            put_pixel(color);
+            //if (i == 0) pwm_led_fade = 95 - r * 3; //255 * r / 255;
+            if (t == duration - 1) frame_buffer[i] = color;
+        }
+
+        sleep_ms(20);
+    }
+}
+/** Fade the existing buffer for `steps` ms */
+void buffer_fade(int steps, int decay_delay) {
+    for (int t = 0; t < steps; t++) {
+        if (t % decay_delay == 0) decay_frame_buffer_by(31, 5);
+        paint_frame_buffer();
+        sleep_ms(1);
     }
 }
 
@@ -564,6 +642,8 @@ int main() {
     ws2812_program_init(pio, sm, offset, PIN_TX, 800000, false);
 
     while(1) {
+        waves();
+        buffer_fade(500, 20);
         fade_up_letters();
         glowing_letters(0);
         paint_letters_to_buffer(frame_buffer);
@@ -574,10 +654,6 @@ int main() {
         paint_letters_to_buffer(frame_buffer); // for a smooth fading to background
         init_background();
         worm();
-        for (int t = 0; t < 800; t++) {
-            if (t % 20 == 0) decay_frame_buffer();
-            paint_frame_buffer();
-            sleep_ms(1);
-        }
+        buffer_fade(500, 20);
     }
 }
