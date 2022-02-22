@@ -641,17 +641,12 @@ int main() {
 
     while(1) {
         waves();
-        buffer_fade(500, 20);
-        fade_up_letters();
-        glowing_letters(0);
-        paint_letters_to_buffer(frame_buffer);
+        buffer_fade(1000, 20);
         fireworks();
-        fade_up_letters();
-        glowing_letters(0);
-
-        paint_letters_to_buffer(frame_buffer); // for a smooth fading to background
+        waves();
+        buffer_fade(1000, 20);
         init_background();
         worm();
-        buffer_fade(500, 20);
+        buffer_fade(1000, 20);
     }
 }
