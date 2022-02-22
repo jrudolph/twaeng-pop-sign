@@ -48,7 +48,7 @@ const uint32_t excl_color = COLOR_BRG(150, 12, 8);
 // positions of pixels in mm/10 as exported from kicad
 // p_x(i) = pixel_pos[i * 2]
 // p_y(i) = pixel_pos[i * 2 + 1]
-// middle (approx): x = 623 | y = 923
+// middle (approx): x = 623 | y = -923
 const int pixel_pos[] = {
     448, -1031,
     448, -967,
@@ -553,14 +553,14 @@ void glowing_letters() {
 }
 
 const float twopi = 2. * 3.1415;
-const float wavelength = 1767;
+const float wavelength = 1700;
 // x span 448, 918
 // y span -1031, -815
 const int center_x = 623;
 const int center_y = -923;
 
 void waves() {
-    int duration = 1000;
+    int duration = 2000;
     for (int t = 0; t < duration; ++t) {
         pwm_led_fade = (int) (50. + 25. * sin(twopi * ((float) t )/ 223));
         int origin_x = 448 + 470 * (sin(twopi * ((float) t / 579)) + 1) / 2;
@@ -569,12 +569,10 @@ void waves() {
             int x = pixel_pos[i * 2];
             int y = pixel_pos[i * 2 + 1];
             float dist = sqrt((x - origin_x) * (x - origin_x) + (y - origin_y) * (y - origin_y));
-            float wave = sin(twopi * ((float)t / 351 +
-                     dist / wavelength
-                ));
+            float wave = sin(twopi * ((float)t / 750 + dist / wavelength));
 
             uint8_t r,g,b;
-            fast_hsv2rgb_32bit(((uint16_t)(wave * 765 + 765)), 200, 40, &r, &g, &b);
+            fast_hsv2rgb_32bit(((uint16_t)(wave * 736 + 150)), 200, 40, &r, &g, &b);
             //fast_hsv2rgb_32bit(((i + t >> 2) * 600 / num_leds + t) % 1530, 255, 50, &r, &g, &b);
             int color = COLOR_BRG(r, g * 130 / 255, b * 80 / 255);
             put_pixel(color);
