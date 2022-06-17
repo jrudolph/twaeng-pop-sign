@@ -19,9 +19,7 @@ Before continuing, please head over to one of the online places where you can li
 
 [cover]: docs/pop-cover.webp
 
-or watch a recent live performance:
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/ba03ugF1Gfo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+or [watch a recent live performance](https://www.youtube.com/watch?v=ba03ugF1Gfo) (without my participation).
 
 ### Hardware
  * WS2812B RGB LEDs on a small PCB (e.g. from ebay or aliexpress)
@@ -67,8 +65,8 @@ a few wires with pin connectors to try them out with the Raspberry Pi Pico.
 
 ![First Attempts](docs/first-attempts.jpg)
 
-The first try already showed some color patterns which are
-part of the pico examples.
+Connecting to the Pico and running the pico example without changes worked
+well and showed the predefined animation patterns of the example.
 
 This looked promising so I came up with a design about how to wire more of those LEDs to form the letters "pop!".
 
@@ -124,7 +122,7 @@ Determining the color values was not as straight-forward as expected. Turning on
  * colors are just not calibrated well
  * a voltage supply smaller than 5V might affect different colors in different ways (red LEDs have a smaller voltage drop than blue ones and there's no information about how WS2812B implement the constant current source for the LEDs and how it is affected by input voltage)
 
-In the end, I found that a balanced white had the RGB values of 255, 130, 80.
+In the end, I found that a balanced white had an RGB value of 255, 130, 80.
 
 TODO: add chaining schematics
 
