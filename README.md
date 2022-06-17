@@ -23,8 +23,8 @@ or [watch a recent live performance](https://www.youtube.com/watch?v=ba03ugF1Gfo
 
 ### Hardware
  * WS2812B RGB LEDs on a small PCB (e.g. from ebay or aliexpress)
- * Raspberry PI Pico
- * Another Raspberry PI Pico (using [picoprobe](https://datasheets.raspberrypi.org/pico/getting-started-with-pico.pdf#%5B%7B%22num%22%3A60%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) for debugging)
+ * Raspberry Pi Pico
+ * Another Raspberry Pi Pico (using [picoprobe](https://datasheets.raspberrypi.org/pico/getting-started-with-pico.pdf#%5B%7B%22num%22%3A60%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22XYZ%22%7D%2C115%2C841.89%2Cnull%5D) for debugging)
  * 0.6mm copper wire
  * connection wires
  * picture frame
